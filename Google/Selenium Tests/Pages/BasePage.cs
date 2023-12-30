@@ -3,6 +3,7 @@ using AventStack.ExtentReports.Reporter;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
+using OpenQA.Selenium.Support.UI;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -72,7 +73,7 @@ namespace Google.Selenium_Tests.Pages
 
         }
 
-        protected void LogTestResult(string testName,string type, string result, string? errorMessage = null)//type can be information,pass or fail
+        protected void LogTestResult(string testName,string type, ExtentTest Test, string result, string? errorMessage = null)//type can be information,pass or fail
         {
             if(type.ToLower().Equals("info"))
             {
@@ -142,6 +143,20 @@ namespace Google.Selenium_Tests.Pages
             Driver?.Quit();
             Extent.Flush();
             Log.CloseAndFlush();
+        }
+
+        protected static void WaitForElementToBeClicked(IWebElement? element,string elementName)
+        {
+            if(element != null)
+            {
+                DefaultWait<IWebElement> fluentWait = new DefaultWait<IWebElement>(element);
+                fluentWait.Timeout = TimeSpan.FromSeconds(5);
+                    fluentWait.PollingInterval = TimeSpan.FromMilliseconds(50);
+                    fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
+                fluentWait.Message = "Element - " + elementName+" -not found or"+"not clickable";
+
+                fluentWait.Until(x => x!=  null && x.Displayed && x.Enabled);
+            }
         }
 
     }
