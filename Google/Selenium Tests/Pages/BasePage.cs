@@ -61,7 +61,7 @@ namespace Google.Selenium_Tests.Pages
             js.ExecuteScript("arguments[0].scrollIntoView(true);", element);
         }
         
-        protected void TakeScreenShot()
+        protected string TakeScreenShot()
         {
             ITakesScreenshot iss = (ITakesScreenshot)Driver;
             Screenshot ss = iss.GetScreenshot();
@@ -70,6 +70,7 @@ namespace Google.Selenium_Tests.Pages
                 DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
 
             ss.SaveAsFile(filepath);
+            return filepath;
 
         }
 
@@ -88,10 +89,10 @@ namespace Google.Selenium_Tests.Pages
             }
             else
             {
+                var screenshotPath=TakeScreenShot();
                 Log.Error($"Test failed for {testName}. \n Exception: \n {errorMessage}");
                 Log.Information("_________________________________");
-                var screenshot=((ITakesScreenshot)Driver).GetScreenshot().AsBase64EncodedString;
-            Test?.AddScreenCaptureFromBase64String(screenshot);
+                Test?.AddScreenCaptureFromPath(screenshotPath,testName);
                 Test?.Fail(result);
             }
 
